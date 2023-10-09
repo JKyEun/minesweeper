@@ -17,19 +17,62 @@ export default function MineSweeperWindow() {
 
   const onFirstClick = (el: EachRect, colIdx: number, elIdx: number) => {
     setIsClickedBefore(true);
-    const updatedMineArray = mineArray;
-    const updatedEl = { isClicked: el.isClicked, isMine: el.isMine, nearMineNum: el.nearMineNum, isFirstClicked: true };
+    const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
+    const updatedEl = {
+      key: el.key,
+      isClicked: true,
+      isMine: el.isMine,
+      nearMineNum: el.nearMineNum,
+      isFirstClicked: true,
+    };
     updatedMineArray[colIdx][elIdx] = updatedEl;
+
+    let currentMineNum = 0;
+    while (currentMineNum < difficulty.mineNum) {
+      const randomRow = Math.floor(Math.random() * difficulty.width);
+      const randomCol = Math.floor(Math.random() * difficulty.height);
+      if (!updatedMineArray[randomRow][randomCol].isMine && !updatedMineArray[randomRow][randomCol].isFirstClicked) {
+        updatedMineArray[randomRow][randomCol].isMine = true;
+        const x = [-1, -1, -1, 0, 0, 1, 1, 1];
+        const y = [-1, 0, 1, -1, 1, -1, 0, 1];
+        for (let i = 0; i < 8; i++) {
+          const newRow = randomRow + x[i];
+          const newCol = randomCol + y[i];
+          if (newRow >= 0 && newRow < difficulty.width && newCol >= 0 && newCol < difficulty.height) {
+            updatedMineArray[newRow][newCol].nearMineNum++;
+          }
+        }
+        currentMineNum++;
+      }
+    }
     dispatch(setMineArray(updatedMineArray));
   };
 
   const onRectClick = (el: EachRect, colIdx: number, elIdx: number) => {
-    if (!isClickedBefore) onFirstClick(el, colIdx, elIdx);
+    if (!isClickedBefore) return onFirstClick(el, colIdx, elIdx);
+
+    const updatedMineArray = [...mineArray];
+    const updatedEl = {
+      key: el.key,
+      isClicked: true,
+      isMine: el.isMine,
+      nearMineNum: el.nearMineNum,
+      isFirstClicked: el.isFirstClicked,
+    };
+    updatedMineArray[colIdx] = [...updatedMineArray[colIdx]];
+    updatedMineArray[colIdx][elIdx] = updatedEl;
+    dispatch(setMineArray(updatedMineArray));
   };
 
   const setInitialMineArray = () => {
-    const initialMineArray: EachRect[][] = new Array(difficulty.height).fill(
-      new Array(difficulty.width).fill({ isClicked: false, isMine: false, nearMineNum: 0, isFirstClicked: false })
+    const initialMineArray: EachRect[][] = new Array(difficulty.height).fill([]).map((_, rowIndex) =>
+      new Array(difficulty.width).fill({}).map((_, colIndex) => ({
+        key: `${rowIndex}-${colIndex}`,
+        isClicked: false,
+        isMine: false,
+        nearMineNum: 0,
+        isFirstClicked: false,
+      }))
     );
     dispatch(setMineArray(initialMineArray));
   };
@@ -64,16 +107,32 @@ export default function MineSweeperWindow() {
           }}
           className="grid">
           {mineArray.map((col, colIdx) => (
-            <div className="col">
+            <div key={col[0].key} className="col">
               {col.map((el: EachRect, elIdx) =>
                 el.isClicked ? (
                   el.isMine ? (
-                    <div className="clicked-rect">💣</div>
+                    <div key={el.key} className="clicked-rect">
+                      💣
+                    </div>
                   ) : (
-                    <div className="clicked-rect">{el.nearMineNum !== 0 ? el.nearMineNum : ''}</div>
+                    <div
+                      key={el.key}
+                      style={{
+                        color:
+                          el.nearMineNum === 1
+                            ? 'blue'
+                            : el.nearMineNum === 2
+                            ? 'green'
+                            : el.nearMineNum === 3
+                            ? 'red'
+                            : 'yellow',
+                      }}
+                      className="clicked-rect">
+                      {el.nearMineNum !== 0 ? el.nearMineNum : ''}
+                    </div>
                   )
                 ) : (
-                  <div onClick={() => onRectClick(el, colIdx, elIdx)} className="rect"></div>
+                  <div key={el.key} onClick={() => onRectClick(el, colIdx, elIdx)} className="rect"></div>
                 )
               )}
             </div>

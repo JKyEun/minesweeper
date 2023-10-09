@@ -6,6 +6,7 @@ export type DifficultyState = {
 };
 
 export type EachRect = {
+  key: string;
   isClicked: boolean;
   isMine: boolean;
   nearMineNum: number;

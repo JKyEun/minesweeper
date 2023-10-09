@@ -63,9 +63,14 @@
           background-color: #c0c0c0;
         }
         .clicked-rect {
+          text-align: center;
+          font-size: 12px;
+          font-weight: 700;
+          line-height: 12px;
           width: 16px;
           height: 16px;
-          border: 1px solid #bdbdbd;
+          background-color: #bdbdbd;
+          border: 1px solid #777;
         }
       }
     }
