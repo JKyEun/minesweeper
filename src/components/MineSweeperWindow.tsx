@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useState } from 'react';
+import React, { MouseEvent, useEffect, useRef, useState } from 'react';
 import '../style/mineSweeperWindow.scss';
 import { useAppDispatch, useAppSelector } from '../store';
 import { EachRect } from '../types/types';
@@ -21,6 +21,7 @@ export default function MineSweeperWindow() {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isGameClear, setIsGameClear] = useState<boolean>(false);
   const [explodeRect, setExplodeRect] = useState<string>('');
+  const nowDownBtn = useRef<string>('');
 
   const onFirstClick = (el: EachRect, colIdx: number, elIdx: number) => {
     setIsClickedBefore(true);
@@ -109,6 +110,7 @@ export default function MineSweeperWindow() {
     dispatch(setMineArray(updatedMineArray));
   };
 
+  const rectsToOpen: { colIdx: number; elIdx: number }[] = [];
   const onRectClick = (el: EachRect, colIdx: number, elIdx: number) => {
     if (el.status === 'flag' || isGameOver || isGameClear) return;
     if (!isClickedBefore) return onFirstClick(el, colIdx, elIdx);
@@ -124,7 +126,6 @@ export default function MineSweeperWindow() {
     };
     updatedMineArray[colIdx][elIdx] = updatedEl;
 
-    const rectsToOpen: { colIdx: number; elIdx: number }[] = [];
     const pushRectsToOpen = (colIdx: number, elIdx: number) => {
       if (
         colIdx < 0 ||
@@ -156,7 +157,6 @@ export default function MineSweeperWindow() {
         if (!isAlreadyPushed) {
           rectsToOpen.push({ colIdx: newRow, elIdx: newCol });
           if (updatedMineArray[newRow][newCol].nearMineNum === 0) {
-            console.log(newRow, newCol);
             pushRectsToOpen(newRow, newCol);
           }
         }
@@ -174,6 +174,8 @@ export default function MineSweeperWindow() {
       };
       updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx] = updatedEl;
     }
+
+    console.log(rectsToOpen);
 
     if (el.isMine) {
       setIsGameOver(true);
@@ -195,6 +197,8 @@ export default function MineSweeperWindow() {
         }
       }
     }
+
+    console.log(updatedMineArray);
 
     dispatch(setMineArray(updatedMineArray));
   };
@@ -265,6 +269,39 @@ export default function MineSweeperWindow() {
     setExplodeRect('');
   };
 
+  const onRectBothClick = (e: MouseEvent<HTMLDivElement>, el: EachRect, colIdx: number, elIdx: number) => {
+    nowDownBtn.current += `${e.button}`;
+
+    if (nowDownBtn.current === '20' || nowDownBtn.current === '02') {
+      const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
+
+      const x = [-1, -1, -1, 0, 0, 1, 1, 1];
+      const y = [-1, 0, 1, -1, 1, -1, 0, 1];
+
+      for (let i = 0; i < 8; i++) {
+        const newRow = colIdx + x[i];
+        const newCol = elIdx + y[i];
+        if (!updatedMineArray[newRow]) continue;
+        if (!updatedMineArray[newRow][newCol]) continue;
+        if (updatedMineArray[newRow][newCol].isMine && updatedMineArray[newRow][newCol].status !== 'flag') return;
+        if (updatedMineArray[newRow][newCol].isMine) continue;
+
+        // const updatedEl = {
+        //   ...mineArray[newRow][newCol],
+        //   isClicked: true,
+        // };
+
+        // updatedMineArray[newRow][newCol] = updatedEl;
+        onRectClick(updatedMineArray[newRow][newCol], newRow, newCol);
+      }
+      // dispatch(setMineArray(updatedMineArray));
+    }
+  };
+
+  const initializeBtnRef = () => {
+    nowDownBtn.current = '';
+  };
+
   useEffect(() => {
     setInitialMineArray();
   }, [difficulty]);
@@ -292,7 +329,6 @@ export default function MineSweeperWindow() {
         }
       }
     }
-    console.log(remainedMines);
     if (remainedMines === 0) {
       setIsGameClear(true);
       setIsTimerActive(false);
@@ -350,6 +386,10 @@ export default function MineSweeperWindow() {
                             ? 'red'
                             : 'yellow',
                       }}
+                      onMouseDown={e => onRectBothClick(e, el, colIdx, elIdx)}
+                      onMouseUp={initializeBtnRef}
+                      onMouseLeave={initializeBtnRef}
+                      onContextMenu={e => e.preventDefault()}
                       className="clicked-rect"
                       id={el.key}>
                       {el.nearMineNum !== 0 ? el.nearMineNum : ''}
