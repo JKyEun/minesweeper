@@ -15,9 +15,13 @@ export default function MineSweeperWindow() {
   const dispatch = useAppDispatch();
   const [isClickedBefore, setIsClickedBefore] = useState<boolean>(false);
   const [flagNum, setFlagNum] = useState<number>(0);
+  const [time, setTime] = useState<number>(0);
+  const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
 
   const onFirstClick = (el: EachRect, colIdx: number, elIdx: number) => {
     setIsClickedBefore(true);
+    setIsTimerActive(true);
+
     const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
     const updatedEl = {
       key: el.key,
@@ -103,6 +107,7 @@ export default function MineSweeperWindow() {
   };
 
   const onRectClick = (el: EachRect, colIdx: number, elIdx: number) => {
+    if (el.status === 'flag') return;
     if (!isClickedBefore) return onFirstClick(el, colIdx, elIdx);
 
     const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
@@ -229,6 +234,18 @@ export default function MineSweeperWindow() {
     setInitialMineArray();
   }, []);
 
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isTimerActive) {
+      interval = setInterval(() => {
+        setTime(cur => cur + 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isTimerActive]);
+
   return (
     <div
       style={{
@@ -247,7 +264,7 @@ export default function MineSweeperWindow() {
         <div className="content-header">
           <div className="mine-left">{String(difficulty.mineNum - flagNum).padStart(3, '0')}</div>
           <div className="yellow-man">🙂</div>
-          <div className="time">000</div>
+          <div className="time">{time > 999 ? '999' : String(time).padStart(3, '0')}</div>
         </div>
         <div
           style={{
