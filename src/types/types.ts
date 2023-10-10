@@ -5,6 +5,15 @@ export type DifficultyState = {
   height: number;
 };
 
+export type DifficultySpec = {
+  [key: string]: {
+    difficulty: string;
+    mineNum: number;
+    width: number;
+    height: number;
+  };
+};
+
 export type EachRect = {
   key: string;
   isClicked: boolean;

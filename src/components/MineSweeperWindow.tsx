@@ -3,10 +3,11 @@ import '../style/mineSweeperWindow.scss';
 import { useAppDispatch, useAppSelector } from '../store';
 import { EachRect } from '../types/types';
 import { setMineArray } from '../store/mineArray';
+import MenuBar from './MenuBar';
 
 export default function MineSweeperWindow() {
   const PADDING = 8;
-  const RECT_WIDTH = 16;
+  const RECT_WIDTH = 18;
   const HEADER_HEIGHT = 16;
   const MENU_HEIGHT = 16;
 
@@ -217,8 +218,8 @@ export default function MineSweeperWindow() {
   };
 
   const setInitialMineArray = () => {
-    const initialMineArray: EachRect[][] = new Array(difficulty.height).fill([]).map((_, rowIndex) =>
-      new Array(difficulty.width).fill({}).map((_, colIndex) => ({
+    const initialMineArray: EachRect[][] = new Array(difficulty.width).fill([]).map((_, rowIndex) =>
+      new Array(difficulty.height).fill({}).map((_, colIndex) => ({
         key: `${rowIndex}-${colIndex}`,
         isClicked: false,
         isMine: false,
@@ -240,7 +241,7 @@ export default function MineSweeperWindow() {
 
   useEffect(() => {
     setInitialMineArray();
-  }, []);
+  }, [difficulty]);
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -257,16 +258,14 @@ export default function MineSweeperWindow() {
   return (
     <div
       style={{
-        width: `${difficulty.width * RECT_WIDTH + PADDING * 4 + 4}px`,
+        width: `${difficulty.width * RECT_WIDTH + PADDING * 4}px`,
         height: `${difficulty.height * RECT_WIDTH + PADDING * 6 + HEADER_HEIGHT + MENU_HEIGHT}px`,
       }}
       className="minesweeper-window">
-      <div className="menu">
-        <div className="game">Game</div>
-      </div>
+      <MenuBar />
       <div
         style={{
-          width: `${difficulty.width * RECT_WIDTH + PADDING * 2 + 2}px`,
+          width: `${difficulty.width * RECT_WIDTH + PADDING * 2 - 14}px`,
         }}
         className="content">
         <div className="content-header">
