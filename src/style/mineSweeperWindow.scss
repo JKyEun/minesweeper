@@ -37,9 +37,13 @@
       }
       .yellow-man {
         @include shadow-border;
+        cursor: pointer;
         height: calc(100% - 2px);
         width: 30px;
         text-align: center;
+      }
+      .yellow-man:active {
+        @include shadow-border-reverse;
       }
       .time {
         background-color: black;

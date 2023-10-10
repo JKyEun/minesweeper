@@ -230,6 +230,14 @@ export default function MineSweeperWindow() {
     dispatch(setMineArray(initialMineArray));
   };
 
+  const onYellowManClick = () => {
+    setInitialMineArray();
+    setIsTimerActive(false);
+    setTime(0);
+    setFlagNum(0);
+    setIsClickedBefore(false);
+  };
+
   useEffect(() => {
     setInitialMineArray();
   }, []);
@@ -263,7 +271,9 @@ export default function MineSweeperWindow() {
         className="content">
         <div className="content-header">
           <div className="mine-left">{String(difficulty.mineNum - flagNum).padStart(3, '0')}</div>
-          <div className="yellow-man">🙂</div>
+          <div onClick={onYellowManClick} className="yellow-man">
+            🙂
+          </div>
           <div className="time">{time > 999 ? '999' : String(time).padStart(3, '0')}</div>
         </div>
         <div
