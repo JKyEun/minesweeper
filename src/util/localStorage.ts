@@ -5,6 +5,9 @@ export const setDifficultyInLocalStorage = (difficulty: DifficultyState): void =
 };
 
 export const getDifficultyInLocalStorage = () => {
-  const difficulty = JSON.parse(window.localStorage.getItem('DIFFICULTY') || '');
-  return difficulty;
+  if (window.localStorage.getItem('DIFFICULTY')) {
+    const difficulty = JSON.parse(window.localStorage.getItem('DIFFICULTY') || '');
+    return difficulty;
+  }
+  return '';
 };
