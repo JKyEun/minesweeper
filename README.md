@@ -1,46 +1,54 @@
-# Getting Started with Create React App
+## 💻 프로젝트 실행 방법
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- Node 버전은 lts를 사용했습니다.
 
-## Available Scripts
+```
+- 프로젝트 루트 폴더로 이동
+- npm i
+- npm start
+```
 
-In the project directory, you can run:
+## ⚒️ 기술 스택
 
-### `npm start`
+- React
+- TypeScript
+- Redux-toolkit
+- SCSS
+- husky & lint-stage
+- prettier & eslint
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 🌿 요구 사항
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 지뢰찾기 게임 구현
 
-### `npm test`
+- 지뢰를 누르면 게임오버가 되고, 모든 지뢰에 깃발을 꽂고 지뢰가 없는 모든 칸을 오픈하면 승리합니다.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### 첫 번째 빈칸에서 지뢰 터지지 않도록
 
-### `npm run build`
+- 첫 번째 빈칸을 열 때 지뢰의 위치를 지정하여 첫 번째 클릭된 위치를 제외하고 지뢰를 배치하였습니다.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 게임 타이머
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- setInterval을 이용하여 구현하였습니다.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### 오른쪽 클릭 깃발 기능
 
-### `npm run eject`
+### 난이도 변경
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- Custom 난이도의 경우 모달로 값을 받도록 하고, 모달 바깥을 클릭 시 모달이 사라지도록 Custom Hook을 만들어 구현했습니다.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🌟 추가 구현 사항
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### 양쪽 클릭 기능
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+- mouse event가 button이라는 값 안에 현재 클릭된 버튼이 왼쪽인지 오른쪽인지에 따라 0과 2를 담고 있어 이를 이용해 구현했습니다.
+- ref에 string으로 0과 2를 추가하여 '20' 또는 '02'일 경우 양쪽 클릭으로 간주했습니다.
+- mouseUp이나 mouseLeave가 발생하면 ref는 초기화됩니다.
 
-## Learn More
+### 난이도 데이터 저장
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- localStorage를 이용했습니다.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### 사용자 친화적인 UI/UX
+
+- 모달과 드롭다운 메뉴의 경우 닫을 수 있는 버튼이 각각 존재하지만 요소의 바깥을 클릭해서도 닫을 수 있도록 했습니다.
