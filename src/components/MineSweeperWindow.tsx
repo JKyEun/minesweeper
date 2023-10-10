@@ -45,13 +45,64 @@ export default function MineSweeperWindow() {
         currentMineNum++;
       }
     }
+
+    const rectsToOpen: { colIdx: number; elIdx: number }[] = [];
+    const pushRectsToOpen = (colIdx: number, elIdx: number) => {
+      if (
+        colIdx < 0 ||
+        colIdx >= difficulty.width ||
+        elIdx < 0 ||
+        elIdx >= difficulty.height ||
+        updatedMineArray[colIdx][elIdx].isMine
+      )
+        return;
+
+      const x = [-1, -1, -1, 0, 0, 1, 1, 1];
+      const y = [-1, 0, 1, -1, 1, -1, 0, 1];
+
+      for (let i = 0; i < 8; i++) {
+        const newRow = colIdx + x[i];
+        const newCol = elIdx + y[i];
+        if (
+          newRow < 0 ||
+          newRow >= difficulty.width ||
+          newCol < 0 ||
+          newCol >= difficulty.height ||
+          updatedMineArray[newRow][newCol].isMine
+        )
+          continue;
+        let isAlreadyPushed = false;
+        for (let j = 0; j < rectsToOpen.length; j++) {
+          if (rectsToOpen[j].colIdx === newRow && rectsToOpen[j].elIdx === newCol) isAlreadyPushed = true;
+        }
+        if (!isAlreadyPushed) {
+          rectsToOpen.push({ colIdx: newRow, elIdx: newCol });
+          if (updatedMineArray[newRow][newCol].nearMineNum === 0) {
+            console.log(newRow, newCol);
+            pushRectsToOpen(newRow, newCol);
+          }
+        }
+      }
+    };
+    pushRectsToOpen(colIdx, elIdx);
+    for (let i = 0; i < rectsToOpen.length; i++) {
+      const updatedEl = {
+        key: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].key,
+        isClicked: true,
+        isMine: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isMine,
+        nearMineNum: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].nearMineNum,
+        isFirstClicked: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isFirstClicked,
+      };
+      updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx] = updatedEl;
+    }
+
     dispatch(setMineArray(updatedMineArray));
   };
 
   const onRectClick = (el: EachRect, colIdx: number, elIdx: number) => {
     if (!isClickedBefore) return onFirstClick(el, colIdx, elIdx);
 
-    const updatedMineArray = [...mineArray];
+    const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
     const updatedEl = {
       key: el.key,
       isClicked: true,
@@ -59,8 +110,58 @@ export default function MineSweeperWindow() {
       nearMineNum: el.nearMineNum,
       isFirstClicked: el.isFirstClicked,
     };
-    updatedMineArray[colIdx] = [...updatedMineArray[colIdx]];
     updatedMineArray[colIdx][elIdx] = updatedEl;
+
+    const rectsToOpen: { colIdx: number; elIdx: number }[] = [];
+    const pushRectsToOpen = (colIdx: number, elIdx: number) => {
+      if (
+        colIdx < 0 ||
+        colIdx >= difficulty.width ||
+        elIdx < 0 ||
+        elIdx >= difficulty.height ||
+        updatedMineArray[colIdx][elIdx].isMine
+      )
+        return;
+
+      const x = [-1, -1, -1, 0, 0, 1, 1, 1];
+      const y = [-1, 0, 1, -1, 1, -1, 0, 1];
+
+      for (let i = 0; i < 8; i++) {
+        const newRow = colIdx + x[i];
+        const newCol = elIdx + y[i];
+        if (
+          newRow < 0 ||
+          newRow >= difficulty.width ||
+          newCol < 0 ||
+          newCol >= difficulty.height ||
+          updatedMineArray[newRow][newCol].isMine
+        )
+          continue;
+        let isAlreadyPushed = false;
+        for (let j = 0; j < rectsToOpen.length; j++) {
+          if (rectsToOpen[j].colIdx === newRow && rectsToOpen[j].elIdx === newCol) isAlreadyPushed = true;
+        }
+        if (!isAlreadyPushed) {
+          rectsToOpen.push({ colIdx: newRow, elIdx: newCol });
+          if (updatedMineArray[newRow][newCol].nearMineNum === 0) {
+            console.log(newRow, newCol);
+            pushRectsToOpen(newRow, newCol);
+          }
+        }
+      }
+    };
+    pushRectsToOpen(colIdx, elIdx);
+    for (let i = 0; i < rectsToOpen.length; i++) {
+      const updatedEl = {
+        key: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].key,
+        isClicked: true,
+        isMine: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isMine,
+        nearMineNum: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].nearMineNum,
+        isFirstClicked: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isFirstClicked,
+      };
+      updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx] = updatedEl;
+    }
+
     dispatch(setMineArray(updatedMineArray));
   };
 
