@@ -19,6 +19,7 @@ export default function MineSweeperWindow() {
   const [time, setTime] = useState<number>(0);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [isGameClear, setIsGameClear] = useState<boolean>(false);
   const [explodeRect, setExplodeRect] = useState<string>('');
 
   const onFirstClick = (el: EachRect, colIdx: number, elIdx: number) => {
@@ -87,7 +88,6 @@ export default function MineSweeperWindow() {
         if (!isAlreadyPushed) {
           rectsToOpen.push({ colIdx: newRow, elIdx: newCol });
           if (updatedMineArray[newRow][newCol].nearMineNum === 0) {
-            console.log(newRow, newCol);
             pushRectsToOpen(newRow, newCol);
           }
         }
@@ -110,7 +110,7 @@ export default function MineSweeperWindow() {
   };
 
   const onRectClick = (el: EachRect, colIdx: number, elIdx: number) => {
-    if (el.status === 'flag' || isGameOver) return;
+    if (el.status === 'flag' || isGameOver || isGameClear) return;
     if (!isClickedBefore) return onFirstClick(el, colIdx, elIdx);
 
     const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
@@ -261,6 +261,7 @@ export default function MineSweeperWindow() {
     setFlagNum(0);
     setIsClickedBefore(false);
     setIsGameOver(false);
+    setIsGameClear(false);
     setExplodeRect('');
   };
 
@@ -280,6 +281,25 @@ export default function MineSweeperWindow() {
     return () => clearInterval(interval);
   }, [isTimerActive]);
 
+  useEffect(() => {
+    if (!mineArray[0]) return;
+    let remainedMines = difficulty.mineNum;
+    for (let i = 0; i < difficulty.width; i++) {
+      for (let j = 0; j < difficulty.height; j++) {
+        if (!mineArray[i][j].isMine && !mineArray[i][j].isClicked) return;
+        if (mineArray[i][j].isMine && mineArray[i][j].status === 'flag') {
+          remainedMines--;
+        }
+      }
+    }
+    console.log(remainedMines);
+    if (remainedMines === 0) {
+      setIsGameClear(true);
+      setIsTimerActive(false);
+      setFlagNum(0);
+    }
+  }, [mineArray]);
+
   return (
     <div
       style={{
@@ -296,7 +316,7 @@ export default function MineSweeperWindow() {
         <div className="content-header">
           <div className="mine-left">{String(difficulty.mineNum - flagNum).padStart(3, '0')}</div>
           <div onClick={onYellowManClick} className="yellow-man">
-            {isGameOver ? '😵' : '🙂'}
+            {isGameOver ? '😵' : isGameClear ? '😎' : '🙂'}
           </div>
           <div className="time">{time > 999 ? '999' : String(time).padStart(3, '0')}</div>
         </div>
