@@ -18,6 +18,8 @@ export default function MineSweeperWindow() {
   const [flagNum, setFlagNum] = useState<number>(0);
   const [time, setTime] = useState<number>(0);
   const [isTimerActive, setIsTimerActive] = useState<boolean>(false);
+  const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [explodeRect, setExplodeRect] = useState<string>('');
 
   const onFirstClick = (el: EachRect, colIdx: number, elIdx: number) => {
     setIsClickedBefore(true);
@@ -108,7 +110,7 @@ export default function MineSweeperWindow() {
   };
 
   const onRectClick = (el: EachRect, colIdx: number, elIdx: number) => {
-    if (el.status === 'flag') return;
+    if (el.status === 'flag' || isGameOver) return;
     if (!isClickedBefore) return onFirstClick(el, colIdx, elIdx);
 
     const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
@@ -171,6 +173,27 @@ export default function MineSweeperWindow() {
         status: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].status,
       };
       updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx] = updatedEl;
+    }
+
+    if (el.isMine) {
+      setIsGameOver(true);
+      setIsTimerActive(false);
+      setExplodeRect(el.key);
+      for (let i = 0; i < difficulty.width; i++) {
+        for (let j = 0; j < difficulty.height; j++) {
+          if (updatedMineArray[i][j].isMine) {
+            const updatedEl = {
+              key: updatedMineArray[i][j].key,
+              isClicked: true,
+              isMine: true,
+              nearMineNum: 0,
+              isFirstClicked: false,
+              status: '',
+            };
+            updatedMineArray[i][j] = updatedEl;
+          }
+        }
+      }
     }
 
     dispatch(setMineArray(updatedMineArray));
@@ -237,6 +260,8 @@ export default function MineSweeperWindow() {
     setTime(0);
     setFlagNum(0);
     setIsClickedBefore(false);
+    setIsGameOver(false);
+    setExplodeRect('');
   };
 
   useEffect(() => {
@@ -271,7 +296,7 @@ export default function MineSweeperWindow() {
         <div className="content-header">
           <div className="mine-left">{String(difficulty.mineNum - flagNum).padStart(3, '0')}</div>
           <div onClick={onYellowManClick} className="yellow-man">
-            🙂
+            {isGameOver ? '😵' : '🙂'}
           </div>
           <div className="time">{time > 999 ? '999' : String(time).padStart(3, '0')}</div>
         </div>
@@ -285,7 +310,11 @@ export default function MineSweeperWindow() {
               {col.map((el: EachRect, elIdx) =>
                 el.isClicked ? (
                   el.isMine ? (
-                    <div key={el.key} className="clicked-rect">
+                    <div
+                      key={el.key}
+                      id={el.key}
+                      style={{ backgroundColor: el.key === explodeRect ? 'red' : '#c0c0c0' }}
+                      className="clicked-rect">
                       💣
                     </div>
                   ) : (
@@ -301,7 +330,8 @@ export default function MineSweeperWindow() {
                             ? 'red'
                             : 'yellow',
                       }}
-                      className="clicked-rect">
+                      className="clicked-rect"
+                      id={el.key}>
                       {el.nearMineNum !== 0 ? el.nearMineNum : ''}
                     </div>
                   )
