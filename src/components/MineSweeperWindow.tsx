@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { MouseEvent, useEffect, useState } from 'react';
 import '../style/mineSweeperWindow.scss';
 import { useAppDispatch, useAppSelector } from '../store';
 import { EachRect } from '../types/types';
@@ -14,6 +14,7 @@ export default function MineSweeperWindow() {
   const mineArray = useAppSelector(state => state.mineArray.mineArray);
   const dispatch = useAppDispatch();
   const [isClickedBefore, setIsClickedBefore] = useState<boolean>(false);
+  const [flagNum, setFlagNum] = useState<number>(0);
 
   const onFirstClick = (el: EachRect, colIdx: number, elIdx: number) => {
     setIsClickedBefore(true);
@@ -24,6 +25,7 @@ export default function MineSweeperWindow() {
       isMine: el.isMine,
       nearMineNum: el.nearMineNum,
       isFirstClicked: true,
+      status: el.status,
     };
     updatedMineArray[colIdx][elIdx] = updatedEl;
 
@@ -92,6 +94,7 @@ export default function MineSweeperWindow() {
         isMine: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isMine,
         nearMineNum: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].nearMineNum,
         isFirstClicked: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isFirstClicked,
+        status: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].status,
       };
       updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx] = updatedEl;
     }
@@ -109,6 +112,7 @@ export default function MineSweeperWindow() {
       isMine: el.isMine,
       nearMineNum: el.nearMineNum,
       isFirstClicked: el.isFirstClicked,
+      status: el.status,
     };
     updatedMineArray[colIdx][elIdx] = updatedEl;
 
@@ -158,8 +162,50 @@ export default function MineSweeperWindow() {
         isMine: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isMine,
         nearMineNum: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].nearMineNum,
         isFirstClicked: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].isFirstClicked,
+        status: updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx].status,
       };
       updatedMineArray[rectsToOpen[i].colIdx][rectsToOpen[i].elIdx] = updatedEl;
+    }
+
+    dispatch(setMineArray(updatedMineArray));
+  };
+
+  const onRectContextMenu = (e: MouseEvent<HTMLDivElement>, el: EachRect, colIdx: number, elIdx: number) => {
+    e.preventDefault();
+
+    const updatedMineArray = JSON.parse(JSON.stringify(mineArray));
+    if (el.status === '') {
+      const updatedEl = {
+        key: el.key,
+        isClicked: el.isClicked,
+        isMine: el.isMine,
+        nearMineNum: el.nearMineNum,
+        isFirstClicked: el.isFirstClicked,
+        status: 'flag',
+      };
+      updatedMineArray[colIdx][elIdx] = updatedEl;
+      setFlagNum(cur => cur + 1);
+    } else if (el.status === 'flag') {
+      const updatedEl = {
+        key: el.key,
+        isClicked: el.isClicked,
+        isMine: el.isMine,
+        nearMineNum: el.nearMineNum,
+        isFirstClicked: el.isFirstClicked,
+        status: 'question-mark',
+      };
+      updatedMineArray[colIdx][elIdx] = updatedEl;
+      setFlagNum(cur => cur - 1);
+    } else {
+      const updatedEl = {
+        key: el.key,
+        isClicked: el.isClicked,
+        isMine: el.isMine,
+        nearMineNum: el.nearMineNum,
+        isFirstClicked: el.isFirstClicked,
+        status: '',
+      };
+      updatedMineArray[colIdx][elIdx] = updatedEl;
     }
 
     dispatch(setMineArray(updatedMineArray));
@@ -173,6 +219,7 @@ export default function MineSweeperWindow() {
         isMine: false,
         nearMineNum: 0,
         isFirstClicked: false,
+        status: '',
       }))
     );
     dispatch(setMineArray(initialMineArray));
@@ -198,7 +245,7 @@ export default function MineSweeperWindow() {
         }}
         className="content">
         <div className="content-header">
-          <div className="mine-left">010</div>
+          <div className="mine-left">{String(difficulty.mineNum - flagNum).padStart(3, '0')}</div>
           <div className="yellow-man">🙂</div>
           <div className="time">000</div>
         </div>
@@ -233,7 +280,13 @@ export default function MineSweeperWindow() {
                     </div>
                   )
                 ) : (
-                  <div key={el.key} onClick={() => onRectClick(el, colIdx, elIdx)} className="rect"></div>
+                  <div
+                    key={el.key}
+                    onClick={() => onRectClick(el, colIdx, elIdx)}
+                    onContextMenu={e => onRectContextMenu(e, el, colIdx, elIdx)}
+                    className="rect">
+                    {el.status === 'flag' ? '⛳️' : el.status === 'question-mark' ? '❓' : ''}
+                  </div>
                 )
               )}
             </div>

@@ -11,6 +11,7 @@ export type EachRect = {
   isMine: boolean;
   nearMineNum: number;
   isFirstClicked: boolean;
+  status: string;
 };
 
 export type MineArrayState = {
