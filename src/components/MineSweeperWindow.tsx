@@ -5,15 +5,16 @@ import { EachRect } from '../types/types';
 import { setMineArray } from '../store/mineArray';
 import MenuBar from './MenuBar';
 
-export default function MineSweeperWindow() {
-  const PADDING = 8;
-  const RECT_WIDTH = 18;
-  const HEADER_HEIGHT = 16;
-  const MENU_HEIGHT = 16;
+const PADDING = 8;
+const RECT_WIDTH = 18;
+const HEADER_HEIGHT = 16;
+const MENU_HEIGHT = 16;
 
+export default function MineSweeperWindow() {
   const difficulty = useAppSelector(state => state.difficulty);
   const mineArray = useAppSelector(state => state.mineArray.mineArray);
   const dispatch = useAppDispatch();
+
   const [isClickedBefore, setIsClickedBefore] = useState<boolean>(false);
   const [flagNum, setFlagNum] = useState<number>(0);
   const [time, setTime] = useState<number>(0);
@@ -21,6 +22,7 @@ export default function MineSweeperWindow() {
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
   const [isGameClear, setIsGameClear] = useState<boolean>(false);
   const [explodeRect, setExplodeRect] = useState<string>('');
+
   const nowDownBtn = useRef<string>('');
 
   const onFirstClick = (el: EachRect, colIdx: number, elIdx: number) => {
