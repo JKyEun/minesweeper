@@ -2,8 +2,10 @@ import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { DifficultyState } from '../types/types';
 import { setDifficultyInLocalStorage } from '../util/localStorage';
 
+const defaultDifficulty = 'Beginner';
+
 const initialDifficultyState: DifficultyState = {
-  difficulty: 'Beginner',
+  difficulty: defaultDifficulty,
   mineNum: 10,
   width: 8,
   height: 8,

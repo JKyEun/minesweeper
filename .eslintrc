@@ -32,6 +32,7 @@
     "arrow-parens": ["error", "as-needed"],
     "no-param-reassign": ["error", { "props": false }],
     "@typescript-eslint/no-shadow": "off",
+    "import/prefer-default-export": "off",
     "react/jsx-props-no-spreading": "off",
     "react/self-closing-comp": "off",
     "jsx-a11y/click-events-have-key-events": "off",

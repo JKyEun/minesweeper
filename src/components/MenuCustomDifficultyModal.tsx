@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from 'react';
 import { useAppDispatch } from '../store';
 import { setDifficulty } from '../store/difficulty';
 
-interface CustomDifficultyModalProps {
+interface MenuCustomDifficultyModalProps {
   modalRef: React.RefObject<HTMLDivElement>;
   setIsCustomModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -11,7 +11,7 @@ const DEFAULT_WIDTH = 16;
 const DEFAULT_HEIGHT = 16;
 const DEFAULT_MINE_NUM = 40;
 
-export default function CustomDifficultyModal({ modalRef, setIsCustomModalOpen }: CustomDifficultyModalProps) {
+export default function MenuCustomDifficultyModal({ modalRef, setIsCustomModalOpen }: MenuCustomDifficultyModalProps) {
   const dispatch = useAppDispatch();
 
   const [widthInput, setWidthInput] = useState<number>(DEFAULT_WIDTH);
